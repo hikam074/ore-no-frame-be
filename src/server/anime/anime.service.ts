@@ -2,25 +2,35 @@ import { getAnimeByMalId, upsertAnime } from "@/server/anime/anime.repo"
 import { getReviewsByMalId } from "@/server/review/review.repo"
 import { fetchMALAnime } from "@/server/mal/mal.client"
 import { shouldUpdateAnime } from "@/server/utils/shouldUpdateAnime"
-import { AnimePageData } from "@/types/anime-page"
+import { AnimeDetailPageResponse } from "@/types/anime-page"
+import { mapAnimeDetailToAnimeDetailResponse, mapAnimeToAnimeDetail, mapMALtoAnime } from "../utils/mapper"
 
 export async function getAnimeDetailData(
   malId: number
-): Promise<AnimePageData | null> {
+): Promise<AnimeDetailPageResponse | null> {
 
-  const [mal, animeRes, reviewsRes] = await Promise.all([
+  const [malRes, animeRes, reviewsRes] = await Promise.all([
     fetchMALAnime(malId),
     getAnimeByMalId(malId),
     getReviewsByMalId(malId),
   ])
 
-  if (!mal) return null
-
+  if (!malRes) return null
+  const mal = malRes
   const dbAnime = animeRes.data ?? null
   const reviews = reviewsRes.data ?? []
 
+  const anime = mapMALtoAnime(mal, {
+    reviews_count: dbAnime?.reviews_count ?? 0,
+    created_at: dbAnime?.created_at ?? '-',
+    updated_at: dbAnime?.updated_at ?? '-',
+  })
+  const animeDetail = mapAnimeToAnimeDetail(anime, mal)
+
+  const res = mapAnimeDetailToAnimeDetailResponse(animeDetail, reviews)
+
   if (shouldUpdateAnime(dbAnime)) {
-    const res = await upsertAnime({
+    const req = await upsertAnime({
       mal_id: mal.id,
       title: mal.title,
       image_url: mal.main_picture?.large,
@@ -31,10 +41,10 @@ export async function getAnimeDetailData(
       mal_rank: mal.rank,
       updated_at: new Date().toISOString(),
     })
-    console.log(`[LOG] LazyUpdateSupa : (${res.status}) ${res.statusText}`)
+    console.log(`[LOG] LazyUpdateSupa : (${req.status}) ${req.statusText}`)
   } else {
     console.log(`[LOG] LazyUpdateSupa : Data is already up-to-date`)
   }
 
-  return { mal, dbAnime, reviews }
+  return res
 }

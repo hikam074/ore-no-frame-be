@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { cookies } from "next/headers"
 
-export const runtime = "edge"
+// export const runtime = "edge"
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
@@ -24,7 +24,7 @@ export async function GET(req: Request) {
     code,
     redirect_uri: process.env.MAL_REDIRECT_URI!,
     client_id: process.env.MAL_CLIENT_ID!,
-    client_secret: process.env.MAL_CLIENT_SECRET!,
+    // client_secret: process.env.MAL_CLIENT_SECRET!,
     code_verifier: codeVerifier,
   })
 
@@ -42,7 +42,7 @@ export async function GET(req: Request) {
     return NextResponse.json(data, { status: 400 })
   }
 
-  const response = NextResponse.redirect("http://localhost:3000")
+  const response = NextResponse.redirect(process.env.BASE_URL!)
 
   response.cookies.set("mal_access_token", data.access_token, {
     httpOnly: true,

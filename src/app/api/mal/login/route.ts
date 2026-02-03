@@ -4,7 +4,7 @@ import {
   generateCodeChallenge,
 } from "@/server/utils/pkce"
 
-export const runtime = "edge"
+// export const runtime = "edge"
 
 export async function GET() {
   const codeVerifier = await generateCodeVerifier()
@@ -21,7 +21,7 @@ export async function GET() {
 
   res.cookies.set("mal_pkce_verifier", codeVerifier, {
     httpOnly: true,
-    secure: true,
+    secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
     maxAge: 300,

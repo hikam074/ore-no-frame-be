@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server"
-import { cookies } from "next/headers"
+// import { cookies } from "next/headers"
+
+// sementara matikan cookies karena search tidak butuh acces key
 
 export const runtime = "edge"
 
@@ -14,27 +16,28 @@ export async function GET(req: Request) {
     )
   }
 
-  const cookieStore = cookies()
-  const accessToken = (await cookieStore).get("mal_access_token")?.value
+  // const cookieStore = cookies()
+  // const accessToken = (await cookieStore).get("mal_access_token")?.value
 
-  if (!accessToken) {
-    return NextResponse.json(
-      { error: "Not authenticated with MAL" },
-      { status: 401 }
-    )
-  }
+  // if (!accessToken) {
+  //   return NextResponse.json(
+  //     { error: "Not authenticated with MAL" },
+  //     { status: 401 }
+  //   )
+  // }
 
   const url =
     "https://api.myanimelist.net/v2/anime?" +
     new URLSearchParams({
       q,
       limit: "10",
-      fields: "id,title,main_picture,start_date,mean,rank",
+      fields: "id,title,main_picture,media_type,start_season,mean,rank",
     })
 
   const res = await fetch(url, {
     headers: {
-      Authorization: `Bearer ${accessToken}`,
+      // Authorization: `Bearer ${accessToken}`,
+      'X-MAL-CLIENT-ID': `${process.env.MAL_CLIENT_ID}`,
     },
   })
 

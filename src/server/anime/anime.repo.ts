@@ -3,7 +3,7 @@ import { Anime } from "@/types/anime"
 
 export async function getAnimeByMalId(malId: number) {
   return supabaseAdmin
-    .from("animes")
+    .from("v_anime_and_reviews_count")
     .select("*")
     .eq("mal_id", malId)
     .maybeSingle<Anime>()
