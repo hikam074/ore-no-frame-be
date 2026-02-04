@@ -1,9 +1,10 @@
 import { getAnimeByMalId, upsertAnime } from "@/server/anime/anime.repo"
 import { getReviewsByMalId } from "@/server/review/review.repo"
-import { fetchMALAnime } from "@/server/mal/mal.client"
+import { fetchMALAnime, fetchSearchMALAnime } from "@/server/mal/mal.client"
 import { shouldUpdateAnime } from "@/server/utils/shouldUpdateAnime"
 import { AnimeDetailPageResponse } from "@/types/anime-page"
-import { mapAnimeDetailToAnimeDetailResponse, mapAnimeToAnimeDetail, mapMALtoAnime } from "../utils/mapper"
+import { mapAnimeDetailToAnimeDetailResponse, mapAnimeToAnimeDetail, mapMALtoAnime, mapMALtoSearchResult } from "../utils/mapper"
+import { AnimeSearchResult } from "@/types/admin-page"
 
 export async function getAnimeDetailData(
   malId: number
@@ -46,5 +47,13 @@ export async function getAnimeDetailData(
     console.log(`[LOG] LazyUpdateSupa : Data is already up-to-date`)
   }
 
+  return res
+}
+export async function getAnimeSearchByName(q:string): Promise<AnimeSearchResult[] | null> {
+  const [malResult] = await Promise.all([fetchSearchMALAnime(q)]) 
+  if (!malResult) return null
+  
+  const res = malResult.map(m => mapMALtoSearchResult(m))
+  
   return res
 }

@@ -1,3 +1,4 @@
+import { AnimeSearchResult } from "@/types/admin-page";
 import { Anime } from "@/types/anime";
 import { AnimeDetailData, AnimeDetailPageResponse } from "@/types/anime-page";
 import { MALAnime } from "@/types/mal";
@@ -32,7 +33,7 @@ export function mapAnimeToAnimeDetail(
         ...anime,
         title_ja: mal.alternative_titles?.ja ?? '',
         title_en: mal.alternative_titles?.en ?? '',
-        
+
         studios: mal.studios?.map(s => s.name) ?? [],
         genres: mal.genres?.map(s => s.name) ?? [],
         synopsis: mal.synopsis ?? '',
@@ -45,5 +46,15 @@ export function mapAnimeDetailToAnimeDetailResponse(
     return {
         metadata: anime,
         reviews: animeReviews
+    }
+}
+export function mapMALtoSearchResult(mal: MALAnime): AnimeSearchResult {
+    return {
+        mal_id: mal.id,
+        title: mal.title,
+        title_en: mal.alternative_titles?.en ?? "",
+        image_url: mal.main_picture?.large ?? "",
+        media_type: mal.media_type ?? "unknown",
+        year: mal.start_season?.year ?? 0
     }
 }

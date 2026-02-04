@@ -1,7 +1,5 @@
-import { NextResponse } from "next/server"
-// import { cookies } from "next/headers"
-
-// sementara matikan cookies karena search tidak butuh acces key
+import { getAnimeSearchByName } from "@/server/anime/anime.service"
+import { jsonResWithCors } from "@/server/http/response"
 
 export const runtime = "edge"
 
@@ -10,42 +8,25 @@ export async function GET(req: Request) {
   const q = searchParams.get("q")
 
   if (!q) {
-    return NextResponse.json(
+    return jsonResWithCors(
       { error: "Query parameter q is required" },
-      { status: 400 }
+      400
     )
   }
 
-  // const cookieStore = cookies()
-  // const accessToken = (await cookieStore).get("mal_access_token")?.value
+  const data = await getAnimeSearchByName(q)
 
-  // if (!accessToken) {
-  //   return NextResponse.json(
-  //     { error: "Not authenticated with MAL" },
-  //     { status: 401 }
-  //   )
-  // }
-
-  const url =
-    "https://api.myanimelist.net/v2/anime?" +
-    new URLSearchParams({
-      q,
-      limit: "10",
-      fields: "id,title,main_picture,media_type,start_season,mean,rank",
-    })
-
-  const res = await fetch(url, {
-    headers: {
-      // Authorization: `Bearer ${accessToken}`,
-      'X-MAL-CLIENT-ID': `${process.env.MAL_CLIENT_ID}`,
-    },
-  })
-
-  const data = await res.json()
-
-  if (!res.ok) {
-    return NextResponse.json(data, { status: res.status })
+  if (!data) {
+    return jsonResWithCors({ 
+      success: true, 
+      message: "None anime can be found", 
+      data: null 
+    }, 200)
   }
 
-  return NextResponse.json(data)
+  return jsonResWithCors({
+    success: true,
+    message: 'Anime(s) retrieved successfully',
+    data: data
+  }, 200)
 }

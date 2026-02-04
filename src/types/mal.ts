@@ -19,3 +19,9 @@ export type MALAnime = {
   studios?: { name: string }[]
   genres?: { name: string }[]
 }
+export type MALSearchResponse = {
+  data: MALSearchItem[]
+}
+export type MALSearchItem = {
+  node: MALAnime
+}

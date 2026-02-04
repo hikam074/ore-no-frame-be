@@ -8,7 +8,6 @@ export async function getAnimeByMalId(malId: number) {
     .eq("mal_id", malId)
     .maybeSingle<Anime>()
 }
-
 export async function getAnimeSuggestions() {
     return supabaseAdmin
     .from("v_anime_and_reviews_count")
@@ -16,7 +15,6 @@ export async function getAnimeSuggestions() {
     .order("mal_rank", { ascending: true })
     .limit(20)
 }
-
 export async function upsertAnime(payload: Partial<Anime>) {
   return supabaseAdmin
     .from("animes")
