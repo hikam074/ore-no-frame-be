@@ -5,7 +5,8 @@ export type Review = {
   verdict: string | null
   personal_score: number | null
   published: boolean
-  reviewer: string
+  reviewer_name: string
+  reviewer_id: string
   created_at: string
   updated_at: string
 }

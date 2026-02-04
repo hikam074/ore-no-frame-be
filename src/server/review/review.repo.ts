@@ -4,7 +4,7 @@ import { Review } from "@/types/review"
 
 export async function getReviewsByMalId(malId: number) {
     return supabaseAdmin
-        .from("reviews")
+        .from("v_reviews_and_reviewer")
         .select("*")
         .eq("mal_id", malId)
         .returns<Review[]>()

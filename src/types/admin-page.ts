@@ -14,7 +14,7 @@ export type AnimeReviewPayload = Pick<Review,
   'content' |
   'personal_score' |
   'published' |
-  'reviewer' |
+  // 'reviewer_id' | // mau diganti jwt
   'created_at' |
   'updated_at' 
 >
