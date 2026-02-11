@@ -12,12 +12,14 @@ export async function GET(
     
     if (Number.isNaN(id)) {
         return jsonResWithCors({ 
-            error: "Anime mal_id is invalid" 
+            success: false,
+            error: "Anime mal_id is invalid",
+            data: undefined
         }, 400 )
     }
 
-    const data = await getAnimeDetailData(id)
-    if (!data) {
+    const res = await getAnimeDetailData(id)
+    if (!res.ok) {
         return jsonResWithCors({ 
             success: false, 
             message: "Anime not found", 
@@ -28,7 +30,7 @@ export async function GET(
     return jsonResWithCors({
         success: true,
         message: 'Anime retrieved successfully',
-        data: data
+        data: res.data
     }, 200)
 }
 

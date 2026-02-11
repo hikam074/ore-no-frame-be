@@ -7,16 +7,16 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
   const q = searchParams.get("q")
 
-  if (!q) {
+  if (!q || q.length < 3) {
     return jsonResWithCors(
-      { error: "Query parameter q is required" },
+      { error: "Query parameter q is required/too short" },
       400
     )
   }
 
-  const data = await getAnimeSearchByName(q)
+  const res = await getAnimeSearchByName(q)
 
-  if (!data) {
+  if (!res.ok) {
     return jsonResWithCors({ 
       success: true, 
       message: "None anime can be found", 
@@ -27,6 +27,6 @@ export async function GET(req: Request) {
   return jsonResWithCors({
     success: true,
     message: 'Anime(s) retrieved successfully',
-    data: data
+    data: res.data
   }, 200)
 }
