@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { getAllReviews } from "@/server/review/review.repo"
+import { getReviewsByUser } from "@/server/review/review.service"
 import { jsonResWithCors } from "@/server/http/response"
 import { optionResponse } from "@/server/http/options"
 import { getUserFromRequest } from "@/server/utils/getUserFromToken"
@@ -11,15 +11,25 @@ export async function OPTIONS() {
     return optionResponse()
 }
 // unused
-export async function GET() {
-    const data = await getAllReviews()
-    return NextResponse.json({
+export async function GET(req: Request) {
+    const user = await getUserFromRequest(req)
+
+    if (!user) {
+        return jsonResWithCors({
+            success: false,
+            message: "Unauthorized",
+        }, 401)
+    }
+
+    const res = await getReviewsByUser(user.id)
+    if (!res.ok) {
+        return
+    }
+    return jsonResWithCors({
         success: true,
         message: 'Reviews retrieved successfully',
-        data: data.data
-    }, {
-        status: 200
-    })
+        data: res.data
+    }, 200)
 }
 export async function POST(req: Request) {
     const user = await getUserFromRequest(req)

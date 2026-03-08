@@ -1,4 +1,4 @@
-import { AnimeSearchResult } from "@/types/admin-page";
+import { AnimeSearchResult, RawReviewAndAnimeResult, ReviewAndAnimeResult } from "@/types/admin-page";
 import { Anime } from "@/types/anime";
 import { AnimeDetailData, AnimeDetailPageResponse } from "@/types/anime-page";
 import { MALAnime } from "@/types/mal";
@@ -56,5 +56,28 @@ export function mapMALtoSearchResult(mal: MALAnime): AnimeSearchResult {
         image_url: mal.main_picture?.large ?? "",
         media_type: mal.media_type ?? "unknown",
         year: mal.start_season?.year ?? 0
+    }
+}
+export function mapRawToReviewAndAnimeResult(p: RawReviewAndAnimeResult): ReviewAndAnimeResult {
+    return {
+        id: p.review_id,
+        mal_id: p.mal_id,
+        content: p.review_content,
+        personal_score: p.review_personal_score,
+        published: p.review_published,
+        reviewer_name: p.review_reviewer_name,
+        reviewer_id: p.review_reviewer_id,
+        created_at: p.review_created_at,
+        updated_at: p.review_updated_at,
+        anime: {
+            mal_id: p.mal_id,
+            title: p.anime_title,
+            image_url: p.anime_image_url,
+            media_type: p.anime_media_type,
+            season: p.anime_season,
+            year: p.anime_year,
+            mal_score: p.anime_mal_score,
+            mal_rank: p.anime_mal_rank
+        }
     }
 }
