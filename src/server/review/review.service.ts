@@ -1,7 +1,7 @@
 import { ReviewAndAnimeResult } from "@/types/admin-page"
 import { Result, AppError } from "@/types/result"
 
-import { mapMALtoSearchResult, mapRawToReviewAndAnimeResult } from "../utils/mapper"
+import { mapRawToReviewAndAnimeResult } from "../utils/mapper"
 import { getReviewsByUserId } from "./review.repo"
 
 export async function getReviewsByUser(id: string): Promise<Result<ReviewAndAnimeResult[] | null, AppError>> {

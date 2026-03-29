@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server"
 import { getReviewsByUser } from "@/server/review/review.service"
 import { jsonResWithCors } from "@/server/http/response"
 import { optionResponse } from "@/server/http/options"

@@ -3,7 +3,7 @@ import { jsonResWithCors } from "@/server/http/response";
 export async function OPTIONS() {
     return optionResponse()
 }
-export async function GET(req: Request) {
+export async function GET() {
     const res = {
         data: [
             {
