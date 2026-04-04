@@ -1,36 +1,123 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# sisi-frame-be (SisiFrame Backend)
 
-## Getting Started
+## Deskripsi Proyek
 
-First, run the development server:
+ ini merupakan layanan backend berbasis API yang dibangun menggunakan framework Next.js. Sistem ini dirancang untuk mengelola konten artikel yang terintegrasi dengan data dari MyAnimeList (MAL) dan menggunakan Supabase sebagai sistem manajemen basis data dan autentikasi. Proyek ini menangani berbagai operasi seperti pengambilan data anime/manga, manajemen artikel, serta proses autentikasi OAuth2 dengan MyAnimeList.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Tech Stack
+
+* **Framework**: Next.js 16.1.6 (App Router)
+
+* **Bahasa Pemrograman**: TypeScript
+
+* **Database & Auth**: Supabase (@supabase/ssr, @supabase/js)
+
+
+* **Runtime**: Edge Runtime (untuk endpoint tertentu)
+
+* **Integrasi Pihak Ketiga**: MyAnimeList API v2
+
+## Struktur Direktori
+
+Berikut adalah gambaran utama direktori:
+
+```text
+├── src/
+│   ├── app/
+│   │   ├── api/                # Endpoint API (Artikel, MAL Auth, dll)
+│   │   │   ├── artikel/        # Handler untuk manajemen artikel
+│   │   │   └── mal/            # Handler untuk login & callback MyAnimeList
+│   │   ├── layout.tsx
+│   │   └── page.tsx
+│   ├── server/                 # Logika bisnis sisi server
+│   │   ├── http/               # Utilitas CORS, opsi, dan respons
+│   │   ├── mal/                # Fetcher data dari MyAnimeList
+│   │   ├── supabase/           # Konfigurasi Admin SDK dan dokumentasi query
+│   │   ├── services/           # Layanan tambahan (seperti update source)
+│   │   └── utils/              # Helper functions (PKCE, token, mapper)
+│   └── types/                  # Definisi tipe data TypeScript
+├── public/                     # Aset statis (SVG, favicon)
+├── .env.example                # Contoh konfigurasi environment
+├── package.json                # Daftar dependensi dan script
+└── tsconfig.json               # Konfigurasi TypeScript
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Fitur Utama
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Manajemen Artikel:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+* **GET /api/artikel**: Mengambil daftar artikel dengan filter status (active, deleted, all), tipe sumber (anime/manga), dan pencarian teks.
 
-## Learn More
+* **POST /api/artikel**: Membuat atau memperbarui artikel dengan validasi user dan integrasi otomatis data dari MyAnimeList.
 
-To learn more about Next.js, take a look at the following resources:
+2. Integrasi MyAnimeList:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+* **MAL Login**: Proses login menggunakan protokol OAuth2 dengan metode PKCE (Code Challenge & Verifier).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+* **Data Fetching**: Mengambil detail data dari MAL untuk dipetakan ke dalam konten artikel.
 
-## Deploy on Vercel
+3. Keamanan & Middleware:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+* Implementasi CORS untuk keamanan akses API.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+* Validasi token pengguna untuk akses endpoint yang diproteksi.
+
+## Setup Environment
+
+Buat file .env di direktori root dan isi berdasarkan referensi dari .env.example:
+
+```text
+# Supabase Configuration
+SUPABASE_URL=your_supabase_url
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+
+# MyAnimeList API Configuration
+MAL_CLIENT_ID=your_mal_client_id
+MAL_CLIENT_SECRET=your_mal_client_secret
+MAL_REDIRECT_URI=your_mal_callback_url
+MAL_BASE_URL=https://api.myanimelist.net/v2
+
+# App Configuration
+BASE_URL=http://localhost:3000
+NEXT_PUBLIC_FRONTEND_URL=your_frontend_url
+NODE_ENV=development
+```
+
+## Instalasi
+
+1. Clone repositori ini.
+
+2. Masuk ke direktori proyek:
+
+```text
+cd be-ore-no-frame
+```
+
+3. Instal dependensi menggunakan npm:
+
+```text
+npm install
+```
+
+## Cara Menjalankan
+
+1. Mode Pengembangan:
+
+```text
+npm run dev
+```
+
+Buka http://localhost:3000 di browser Anda.
+
+2. Build untuk Produksi:
+
+```text
+npm run build
+npm start
+```
+
+3. Linting:
+
+```text
+npm run lint
+```
