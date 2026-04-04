@@ -12,19 +12,52 @@ export async function OPTIONS() {
 }
 
 // GET /api/artikel?...
+// PARAM :
+// ?search=...
+// ?active=true 
+// ?active=false
+// ?active=all
+// ?source_type=anime
+// ?source_type=manga
+// ?source_type=unknown
 export async function GET(req: Request) {
     // ambil query params
     const { searchParams } = new URL(req.url)
     // ambil ?source_type=...
     const sourceType = searchParams.get("source_type")?.toLowerCase()
+    // ambil ?active=...
+    const activeParam = searchParams.get("active")?.toLowerCase()
+    // ambil ?search=...
+    const queryParam = searchParams.get("search")?.toLowerCase()
+
+    // konfigurasi table
+    // default
+    let tableName = "v_artikel_kards"
+    // ?active=true
+    if (activeParam === "true") {
+        tableName = "v_active_artikel_kards"
+    }
+    // ?active=false khusus admin
+    else if (activeParam === "false") {
+        tableName = "v_deleted_artikel_kards"
+    }
+    // ?active=all khusus admin
+    else if (activeParam === "all") {
+        tableName = "v_all_artikel_kards"
+    }
+
     // build query
     let query = supabaseAdmin
-        .from("v_artikel_kards")
+        .from(tableName)
         .select("*")
     // kalo ada param maka masukkan
     if (sourceType) {
         query = query.eq("source_type", sourceType)
     }
+    if (queryParam && queryParam.length > 0) {
+        query = query.or(`title.ilike.%${queryParam}%, slug.ilike.%${queryParam}%, short_description.ilike.%${queryParam}%, source->>title.ilike.%${queryParam}%`)
+    }
+
     // panggil
     const { data, error } = await query
     // kalu error return 500
@@ -43,6 +76,7 @@ export async function GET(req: Request) {
             data: undefined
         }, 404)
     }
+    console.log(data)
     // kalau berhasil return 200
     return jsonResWithCors({
         success: true,
@@ -61,7 +95,6 @@ export async function POST(req: Request) {
             message: "Unauthorized",
         }, 401)
     }
-
 
     const body = await req.json()
 
@@ -92,13 +125,12 @@ export async function POST(req: Request) {
         }
     })
     if (error) {
-        console.log(error)
         return jsonResWithCors({
             success: false,
             message: error.message
         }, 500)
     }
-    console.log("RPC RESULT:", { data, error })
+
     return jsonResWithCors({
         success: true,
         message: body.artikel_id ? "Artikel updated successfully" : "Artikel created successfully",

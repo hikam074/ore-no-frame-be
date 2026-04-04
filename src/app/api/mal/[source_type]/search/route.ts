@@ -1,3 +1,4 @@
+import { optionResponse } from "@/server/http/options"
 import { jsonResWithCors } from "@/server/http/response"
 import { mapMALtoSearchResult } from "@/server/utils"
 
@@ -6,6 +7,10 @@ import { MALApiResponse } from "@/types"
 export const runtime = "edge"
 
 const reqLimit = 5
+
+export async function OPTIONS() {
+    return optionResponse()
+}
 
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url)

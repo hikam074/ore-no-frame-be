@@ -52,8 +52,6 @@ export async function GET(
         data.source.id
     )
 
-    console.log(data)
-
     return jsonResWithCors({
         success: true,
         message: 'Artikel retrieved successfully',
