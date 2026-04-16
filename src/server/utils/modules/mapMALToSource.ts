@@ -1,10 +1,19 @@
 import { MALResponse } from "@/types"
 
 export function mapMALToSource(mal: MALResponse) {
+    // bentuk bulan berupa string
     let month: string | null = null
     if (mal.start_date) {
         const date = new Date(mal.start_date)
         month = date.toLocaleString("en-US", { month: "long" }) // "June"
+    }
+    // ambil tahun dari start_season kalau ada, kalau tidak ambil dari start_date
+    let year: number | null = null
+    if (!mal.start_season && mal.start_date) {
+        const date = new Date(mal.start_date)
+        year = date.getFullYear()
+    } else if (mal.start_season) {
+        year = mal.start_season.year
     }
     return {
         mal_id: mal.id,
@@ -16,7 +25,7 @@ export function mapMALToSource(mal: MALResponse) {
         mal_score: mal.mean ?? null,
         mal_rank: mal.rank ?? null,
         season: mal.start_season?.season ?? null,
-        year: mal.start_season?.year ?? null,
+        year,
         month,
         genres: mal.genres?.map(g => g.name) ?? [],
         studios: mal.studios?.map(s => s.name) ?? [],
