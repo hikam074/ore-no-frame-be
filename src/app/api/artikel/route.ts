@@ -76,7 +76,6 @@ export async function GET(req: Request) {
             data: undefined
         }, 404)
     }
-    console.log(data)
     // kalau berhasil return 200
     return jsonResWithCors({
         success: true,

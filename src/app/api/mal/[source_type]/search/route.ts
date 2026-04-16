@@ -43,7 +43,6 @@ export async function GET(req: Request) {
         }
         
         const json: MALApiResponse = await res.json()
-        // console.log(json)
 
         const raw = json.data?.map(item => item.node) ?? []
 
