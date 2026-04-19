@@ -392,3 +392,114 @@ $$;
 drop function if exists delete_artikel_with_cleanup;
 notify pgrst, 'reload schema';
 
+-- FUNCTION get data for dashboard
+create or replace function get_dashboard_data()
+returns json
+language sql
+as $$
+select json_build_object(
+
+  -- total active articles
+  'total_active_article',
+  (select count(*) from articles where is_published = true),
+
+  -- total all articles
+  'total_all_article',
+  (select count(*) from articles),
+
+  -- statistik per bulan
+  'statistic_article_created',
+  (
+    select json_agg(
+      json_build_object(
+        'label', to_char(months.month, 'FMMon YYYY'),
+        'value', coalesce(counts.total, 0)
+      )
+      order by months.month
+    )
+    from (
+      -- generate 12 bulan terakhir (termasuk bulan sekarang)
+      select generate_series(
+        date_trunc('month', now()) - interval '11 months',
+        date_trunc('month', now()),
+        interval '1 month'
+      ) as month
+    ) months
+    left join (
+      -- data asli dari articles
+      select date_trunc('month', created_at) as month,
+            count(*) as total
+      from articles
+      group by 1
+    ) counts
+    on months.month = counts.month
+  ),
+  'statistic_article_updated',
+  (
+    select json_agg(
+      json_build_object(
+        'label', to_char(months.month, 'FMMon YYYY'),
+        'value', coalesce(counts.total, 0)
+      )
+      order by months.month
+    )
+    from (
+      select generate_series(
+        date_trunc('month', now()) - interval '11 months',
+        date_trunc('month', now()),
+        interval '1 month'
+      ) as month
+    ) months
+    left join (
+      select date_trunc('month', updated_at) as month,
+            count(*) as total
+      from articles
+      where updated_at is distinct from created_at
+        and updated_at >= date_trunc('month', now()) - interval '11 months'
+      group by 1
+    ) counts
+    on months.month = counts.month
+  ),
+
+  -- total created bulan ini
+  'this_month_created',
+  (
+    select count(*)
+    from articles
+    where date_trunc('month', created_at) = date_trunc('month', now())
+  ),
+  -- total updated bulan ini
+  'this_month_updated',
+  (
+    select count(*)
+    from articles
+    where updated_at is distinct from created_at
+      and date_trunc('month', updated_at) = date_trunc('month', now())
+  ),
+
+  -- recent created
+  'recent_created_articles',
+  (
+    select json_agg(row_to_json(t))
+    from (
+      select *
+      from v_active_artikel_kards
+      order by created_at desc
+      limit 5
+    ) t
+  ),
+
+  -- recent updated
+  'recent_updated_articles',
+  (
+    select json_agg(row_to_json(t))
+    from (
+      select *
+      from v_active_artikel_kards
+      order by updated_at desc
+      limit 5
+    ) t
+  )
+
+);
+$$;
