@@ -26,7 +26,7 @@ export async function GET(req: Request) {
 
     try {
         const res = await fetch(
-            `${process.env.MAL_BASE_URL}/${sourceType}?q=${q}&limit=${reqLimit}&fields=title,main_picture,alternative_titles,synopsis,media_type,mean,rank,start_season,studios,genres,start_date`,
+            `${process.env.MAL_BASE_URL}/${sourceType}?q=${q}&limit=${reqLimit}&fields=title,main_picture,alternative_titles,synopsis,media_type,mean,rank,start_season,studios,genres,start_date&nsfw=${process.env.MAL_ALLOW_NSFW}`,
             {
                 headers: {
                     "X-MAL-CLIENT-ID": process.env.MAL_CLIENT_ID!,
