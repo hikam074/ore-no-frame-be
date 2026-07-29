@@ -5,7 +5,7 @@ export async function fetchMAL(
     malId: number
 ): Promise<MALResponse | null> {
     const res = await fetch(
-        `${process.env.MAL_BASE_URL}/${source_type}/${malId}?fields=title,alternative_titles,main_picture,media_type,mean,rank,start_date,start_season,studios,genres`,
+        `${process.env.MAL_BASE_URL}/${source_type}/${malId}?fields=title,alternative_titles,main_picture,media_type,mean,rank,start_date,start_season,studios,genres&nsfw=${process.env.MAL_ALLOW_NSFW}`,
         {
             headers: {
                 "X-MAL-CLIENT-ID": process.env.MAL_CLIENT_ID!,
